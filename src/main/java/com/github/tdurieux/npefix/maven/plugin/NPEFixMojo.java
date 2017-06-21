@@ -15,11 +15,16 @@ import fr.inria.spirals.npefix.resi.strategies.Strat4;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.surefire.log.api.NullConsoleLogger;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.plugins.surefire.report.ReportTestCase;
+import org.apache.maven.plugins.surefire.report.ReportTestSuite;
+import org.apache.maven.plugins.surefire.report.SurefireReportParser;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.reporting.MavenReportException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -27,6 +32,7 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 @Mojo( name = "npefix",
         defaultPhase = LifecyclePhase.TEST,
@@ -36,7 +42,7 @@ public class NPEFixMojo extends AbstractMojo {
     /**
      * Location of the file.
      */
-    @Parameter( defaultValue = "${project.build.directory}", property = "outputDir", required = true )
+    @Parameter( defaultValue = "${project.build.directory}/npefix", property = "outputDir", required = true )
     private File outputDirectory;
 
     @Parameter(defaultValue="${project}", readonly=true, required=true)
@@ -49,7 +55,10 @@ public class NPEFixMojo extends AbstractMojo {
     private boolean aggregate;
 
     public void execute() throws MojoExecutionException {
-        List<File> reportsDirectories = getReportsDirectories();
+        List<String> npeTests = getNPETest();
+        if (npeTests.isEmpty()) {
+            throw new RuntimeException("No failing test with NullPointerException");
+        }
 
         final List<String> dependencies = getClasspath();
         List<String> sourceFolders = getSourceFolders();
@@ -66,13 +75,13 @@ public class NPEFixMojo extends AbstractMojo {
             String s = sourceFolders.get(i);
             sources[indexSource] = s;
         }
-        dependencies.add(new File("npefix-bin").getAbsolutePath());
+        dependencies.add(outputDirectory.getAbsolutePath() + "/npefix-bin");
 
-        Launcher  npefix = new Launcher(sources, "npefix-output", "npefix-bin", classpath(dependencies));
+        Launcher  npefix = new Launcher(sources, outputDirectory.getAbsolutePath() + "/npefix-output", outputDirectory.getAbsolutePath() + "/npefix-bin", classpath(dependencies));
 
         npefix.instrument();
 
-        NPEOutput lapses = npefix.runStrategy(new NoStrat(),
+        NPEOutput lapses = npefix.runStrategy(npeTests, new NoStrat(),
                 new Strat1A(),
                 new Strat1B(),
                 new Strat2A(),
@@ -85,8 +94,7 @@ public class NPEFixMojo extends AbstractMojo {
 
 
         spoon.Launcher spoon = new spoon.Launcher();
-        for (int i = 0; i < sourceFolders.size(); i++) {
-            String s = sourceFolders.get(i);
+        for (String s : sourceFolders) {
             spoon.addInputResource(s);
         }
 
@@ -99,7 +107,7 @@ public class NPEFixMojo extends AbstractMojo {
             for (Decision decision : CallChecker.strategySelector.getSearchSpace()) {
                 jsonObject.append("searchSpace", decision.toJSON());
             }
-            jsonObject.write(new FileWriter("patches.json"));
+            jsonObject.write(new FileWriter(outputDirectory.getAbsolutePath() + "/patches.json"));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -118,22 +126,9 @@ public class NPEFixMojo extends AbstractMojo {
         return sb.toString();
     }
 
-    private List<MavenProject> getProjects() {
-        List<MavenProject> projects = new ArrayList<MavenProject>();
-        if ( aggregate ) {
-            if ( !project.isExecutionRoot() ) {
-                return projects;
-            }
-            projects.addAll(getProjectsWithoutRoot());
-        } else {
-            projects.add(project);
-        }
-        return projects;
-    }
-
     private List<String> getClasspath() {
         List<String> classpath = new ArrayList<String>();
-        for (MavenProject mavenProject : getProjects()) {
+        for (MavenProject mavenProject : reactorProjects) {
             try {
                 classpath.addAll(mavenProject.getTestClasspathElements());
                 classpath.removeAll(mavenProject.getSystemClasspathElements());
@@ -153,7 +148,7 @@ public class NPEFixMojo extends AbstractMojo {
 
     private List<String> getSourceFolders() {
         List<String> sourceFolder = new ArrayList<String>();
-        for (MavenProject mavenProject : getProjects()) {
+        for (MavenProject mavenProject : reactorProjects) {
             sourceFolder.add(mavenProject.getBuild().getSourceDirectory());
         }
         return sourceFolder;
@@ -161,7 +156,7 @@ public class NPEFixMojo extends AbstractMojo {
 
     private List<String> getTestFolders() {
         List<String> sourceFolder = new ArrayList<String>();
-        for (MavenProject mavenProject : getProjects()) {
+        for (MavenProject mavenProject : reactorProjects) {
             sourceFolder.add(mavenProject.getBuild().getTestSourceDirectory());
         }
         return sourceFolder;
@@ -195,5 +190,28 @@ public class NPEFixMojo extends AbstractMojo {
     private File getSurefireReportsDirectory( MavenProject subProject ) {
         String buildDir = subProject.getBuild().getDirectory();
         return new File( buildDir + "/surefire-reports" );
+    }
+
+    private List<String> getNPETest() {
+        List<String> output = new ArrayList<>();
+
+        List<File> reportsDirectories = getReportsDirectories();
+        SurefireReportParser parser = new SurefireReportParser(reportsDirectories, Locale.ENGLISH, new NullConsoleLogger());
+        try {
+            List<ReportTestSuite> testSuites = parser.parseXMLReportFiles();
+            for (int i = 0; i < testSuites.size(); i++) {
+                ReportTestSuite reportTestSuite = testSuites.get(i);
+                List<ReportTestCase> testCases = reportTestSuite.getTestCases();
+                for (int j = 0; j < testCases.size(); j++) {
+                    ReportTestCase reportTestCase = testCases.get(j);
+                    if (reportTestCase.hasFailure() && reportTestCase.getFailureDetail().contains("NullPointerException")) {
+                        output.add(reportTestCase.getFullClassName() + "#" + reportTestCase.getName());
+                    }
+                }
+            }
+        } catch (MavenReportException e) {
+            e.printStackTrace();
+        }
+        return output;
     }
 }
