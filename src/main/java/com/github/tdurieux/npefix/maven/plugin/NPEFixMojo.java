@@ -12,10 +12,14 @@ import fr.inria.spirals.npefix.resi.strategies.Strat2A;
 import fr.inria.spirals.npefix.resi.strategies.Strat2B;
 import fr.inria.spirals.npefix.resi.strategies.Strat3;
 import fr.inria.spirals.npefix.resi.strategies.Strat4;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.surefire.log.api.NullConsoleLogger;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -39,11 +43,21 @@ import java.util.Locale;
         requiresDependencyResolution = ResolutionScope.TEST)
 //@Execute( lifecycle = "surefire", phase = LifecyclePhase.TEST )
 public class NPEFixMojo extends AbstractMojo {
+
+    @Component
+    private ArtifactFactory artifactFactory;
+
     /**
      * Location of the file.
      */
     @Parameter( defaultValue = "${project.build.directory}/npefix", property = "outputDir", required = true )
     private File outputDirectory;
+
+    @Parameter( defaultValue = "${project.build.directory}/npefix", property = "resultDir", required = true )
+    private File resultDirectory;
+
+    @Parameter( defaultValue = "dom", property = "selector", required = true )
+    private String selector;
 
     @Parameter(defaultValue="${project}", readonly=true, required=true)
     private MavenProject project;
@@ -54,15 +68,23 @@ public class NPEFixMojo extends AbstractMojo {
     @Parameter( defaultValue = "false", property = "aggregate" )
     private boolean aggregate;
 
+    @Parameter(defaultValue="${localRepository}")
+    private ArtifactRepository localRepository;
+
+
     public void execute() throws MojoExecutionException {
         List<String> npeTests = getNPETest();
-        if (npeTests.isEmpty()) {
-            throw new RuntimeException("No failing test with NullPointerException");
-        }
+
 
         final List<String> dependencies = getClasspath();
         List<String> sourceFolders = getSourceFolders();
         List<String> testFolders = getTestFolders();
+
+        classpath(dependencies);
+
+        if (npeTests.isEmpty()) {
+            throw new RuntimeException("No failing test with NullPointerException");
+        }
 
         final String[] sources = new String[sourceFolders.size() + testFolders.size()];
         int indexSource = 0;
@@ -75,9 +97,14 @@ public class NPEFixMojo extends AbstractMojo {
             String s = sourceFolders.get(i);
             sources[indexSource] = s;
         }
-        dependencies.add(outputDirectory.getAbsolutePath() + "/npefix-bin");
+        File binFolder = new File(outputDirectory.getAbsolutePath() + "/npefix-bin");
 
-        Launcher  npefix = new Launcher(sources, outputDirectory.getAbsolutePath() + "/npefix-output", outputDirectory.getAbsolutePath() + "/npefix-bin", classpath(dependencies));
+        dependencies.add(binFolder.getAbsolutePath());
+        if (!binFolder.exists()) {
+            binFolder.mkdirs();
+        }
+
+        Launcher  npefix = new Launcher(sources, outputDirectory.getAbsolutePath() + "/npefix-output", binFolder.getAbsolutePath(), classpath(dependencies));
 
         npefix.instrument();
 
@@ -107,7 +134,7 @@ public class NPEFixMojo extends AbstractMojo {
             for (Decision decision : CallChecker.strategySelector.getSearchSpace()) {
                 jsonObject.append("searchSpace", decision.toJSON());
             }
-            jsonObject.write(new FileWriter(outputDirectory.getAbsolutePath() + "/patches.json"));
+            jsonObject.write(new FileWriter(resultDirectory.getAbsolutePath() + "/patches.json"));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -121,7 +148,12 @@ public class NPEFixMojo extends AbstractMojo {
                 sb.append(s).append(File.pathSeparatorChar);
             }
         }
-        sb.append("/home/thomas/.m2/repository/fr/inria/spirals/npefix/0.4-SNAPSHOT/npefix-0.4-SNAPSHOT.jar").append(File.pathSeparatorChar);
+        final Artifact artifact =artifactFactory.createArtifact("fr.inria.spirals","npefix", "0.4-SNAPSHOT", null, "jar");
+        File file = new File(
+                localRepository.getBasedir() + "/" +
+                        localRepository.pathOf(artifact));
+
+        sb.append(file.getAbsoluteFile());
         System.out.println(sb);
         return sb.toString();
     }
@@ -204,7 +236,7 @@ public class NPEFixMojo extends AbstractMojo {
                 List<ReportTestCase> testCases = reportTestSuite.getTestCases();
                 for (int j = 0; j < testCases.size(); j++) {
                     ReportTestCase reportTestCase = testCases.get(j);
-                    if (reportTestCase.hasFailure() && reportTestCase.getFailureDetail().contains("NullPointerException")) {
+                    if (reportTestCase.hasFailure() && reportTestCase.getFailureType().contains("NullPointerException")) {
                         output.add(reportTestCase.getFullClassName() + "#" + reportTestCase.getName());
                     }
                 }
