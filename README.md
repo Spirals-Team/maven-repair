@@ -22,7 +22,7 @@ mvn test
 mvn fr.inria.spirals:npefix-maven:1.0-SNAPSHOT:npefix
 ```
 
-## Ouput
+## Output
 
 ```
 # the patches are in target
