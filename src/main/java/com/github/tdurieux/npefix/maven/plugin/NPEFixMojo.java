@@ -43,16 +43,21 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
-@Mojo( name = "npefix",
+@Mojo( name = "npefix", aggregator = true,
         defaultPhase = LifecyclePhase.TEST,
         requiresDependencyResolution = ResolutionScope.TEST)
 //@Execute( lifecycle = "surefire", phase = LifecyclePhase.TEST )
 public class NPEFixMojo extends AbstractMojo {
 
-    @Parameter(property = "maven.compiler.source", defaultValue = "1.5")
+    @Parameter(property = "java.version", defaultValue = "-1")
+    protected String javaVersion;
+
+    @Parameter(property = "maven.compiler.source", defaultValue = "-1")
     protected String source;
 
     @Parameter(property = "maven.compile.source", defaultValue = "-1")
@@ -82,9 +87,6 @@ public class NPEFixMojo extends AbstractMojo {
     @Parameter( defaultValue = "${reactorProjects}", readonly = true )
     private List<MavenProject> reactorProjects;
 
-    @Parameter( defaultValue = "false", property = "aggregate" )
-    private boolean aggregate;
-
     @Parameter(defaultValue="${localRepository}")
     private ArtifactRepository localRepository;
 
@@ -109,10 +111,12 @@ public class NPEFixMojo extends AbstractMojo {
         for (int i = 0; i < testFolders.size(); i++, indexSource++) {
             String s = testFolders.get(i);
             sources[indexSource] = s;
+            System.out.println("Test: " + s);
         }
         for (int i = 0; i < sourceFolders.size(); i++, indexSource++) {
             String s = sourceFolders.get(i);
             sources[indexSource] = s;
+            System.out.println("Source: " + s);
         }
         File binFolder = new File(outputDirectory.getAbsolutePath() + "/npefix-bin");
 
@@ -120,10 +124,15 @@ public class NPEFixMojo extends AbstractMojo {
         if (!binFolder.exists()) {
             binFolder.mkdirs();
         }
-        int complianceLevel = Integer.parseInt(source.substring(2));
-        if (!oldSource.equals("-1")) {
+        int complianceLevel = 7;
+        if (!source.equals("-1")) {
+            complianceLevel = Integer.parseInt(source.substring(2));
+        } else if (!oldSource.equals("-1")) {
             complianceLevel = Integer.parseInt(oldSource.substring(2));
+        } else if (!javaVersion.equals("-1")) {
+            complianceLevel = Integer.parseInt(javaVersion.substring(2, 3));
         }
+        System.out.println("ComplianceLevel: " + complianceLevel);
 
         Date initDate = new Date();
 
@@ -276,32 +285,34 @@ public class NPEFixMojo extends AbstractMojo {
     }
 
     private List<String> getSourceFolders() {
-        List<String> sourceFolder = new ArrayList<String>();
+        Set<String> sourceFolder = new HashSet<>();
         for (MavenProject mavenProject : reactorProjects) {
-            sourceFolder.add(mavenProject.getBuild().getSourceDirectory());
+            File sourceDirectory = new File(mavenProject.getBuild().getSourceDirectory());
+            if (sourceDirectory.exists()) {
+                sourceFolder.add(sourceDirectory.getAbsolutePath());
+            }
         }
-        return sourceFolder;
+        return new ArrayList<>(sourceFolder);
     }
 
     private List<String> getTestFolders() {
-        List<String> sourceFolder = new ArrayList<String>();
+        Set<String> sourceFolder = new HashSet<String>();
         for (MavenProject mavenProject : reactorProjects) {
-            sourceFolder.add(mavenProject.getBuild().getTestSourceDirectory());
+            File sourceDirectory = new File(mavenProject.getBuild().getTestSourceDirectory());
+            if (sourceDirectory.exists()) {
+                sourceFolder.add(sourceDirectory.getAbsolutePath());
+            }
         }
-        return sourceFolder;
+        return new ArrayList<>(sourceFolder);
     }
 
     private List<File> getReportsDirectories() {
         List<File> resolvedReportsDirectories = new ArrayList<File>();
-        if ( aggregate ) {
-            if ( !project.isExecutionRoot() ) {
-                return null;
-            }
-            for (MavenProject mavenProject : getProjectsWithoutRoot()) {
-                resolvedReportsDirectories.add(getSurefireReportsDirectory(mavenProject));
-            }
-        } else {
-            resolvedReportsDirectories.add(getSurefireReportsDirectory(project));
+        if ( !project.isExecutionRoot() ) {
+            return null;
+        }
+        for (MavenProject mavenProject : reactorProjects) {
+            resolvedReportsDirectories.add(getSurefireReportsDirectory(mavenProject));
         }
         return resolvedReportsDirectories;
     }
