@@ -1,4 +1,4 @@
-# npefix-maven
+# npefix-maven [![Build Status](https://travis-ci.org/Spirals-Team/npefix-maven.svg?branch=master)](https://travis-ci.org/Spirals-Team/npefix-maven)
 
 This is a Maven plugin for NPEFix. It's only goal is to simplify the usage of NPEFix on Maven project.
 
