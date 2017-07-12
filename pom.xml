@@ -24,7 +24,8 @@
   </properties>
 
   <scm>
-    <developerConnection>scm:git:git://github.com/Spirals-Team/npefix-maven</developerConnection>
+    <connection>scm:git:ssh://github.com/Spirals-Team/npefix-maven.git</connection>
+    <developerConnection>scm:git:[fetch=]https://github.com/Spirals-Team/npefix-maven.git[push=]ssh://git@github.com/Spirals-Team/npefix-maven.git</developerConnection>
   </scm>
 
   <dependencies>
@@ -71,6 +72,10 @@
     <repository>
       <id>codedance on Github</id>
       <url>https://tdurieux.github.io/maven-repository/snapshots/</url>
+    </repository>
+    <repository>
+      <id>releases codedance on Github</id>
+      <url>https://tdurieux.github.io/maven-repository/releases/</url>
     </repository>
   </repositories>
 
