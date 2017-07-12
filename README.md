@@ -19,7 +19,7 @@ cd /somewhere/my-project-with-an-NPE
 mvn test 
 
 # look for patches
-mvn fr.inria.spirals:npefix-maven:1.0-SNAPSHOT:npefix
+mvn fr.inria.gforge.spirals:npefix-maven:1.0:npefix
 ```
 
 ## Output
