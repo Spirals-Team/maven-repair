@@ -274,7 +274,7 @@ public class NPEFixMojo extends AbstractMojo {
                 sb.append(s).append(File.pathSeparatorChar);
             }
         }
-        final Artifact artifact =artifactFactory.createArtifact("fr.inria.spirals","npefix", "0.4-SNAPSHOT", null, "jar");
+        final Artifact artifact =artifactFactory.createArtifact("fr.inria.spirals","npefix", "0.5-SNAPSHOT", null, "jar");
         File file = new File(localRepository.getBasedir() + "/" + localRepository.pathOf(artifact));
 
         sb.append(file.getAbsoluteFile());
