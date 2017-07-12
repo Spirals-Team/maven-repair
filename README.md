@@ -18,8 +18,11 @@ cd /somewhere/my-project-with-an-NPE
 # check there is a NullPointerException
 mvn test 
 
-# look for patches
-mvn fr.inria.gforge.spirals:npefix-maven:1.0:npefix
+# look for patches with last release
+mvn fr.inria.gforge.spirals:npefix-maven:1.1:npefix
+
+# look for patches with snapshot
+mvn fr.inria.gforge.spirals:npefix-maven:1.2-SNAPSHOT:npefix
 ```
 
 ## Output
