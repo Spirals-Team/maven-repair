@@ -113,7 +113,7 @@ public class NPEFixMojo extends AbstractMojo {
         classpath(dependencies);
 
         if (npeTests.isEmpty()) {
-            throw new RuntimeException("No failing test with NullPointerException");
+            throw new RuntimeException("No failing test with NullPointerException or the NPE occurred outside the source.");
         }
 
         final String[] sources = new String[sourceFolders.size() /* + testFolders.size()*/];
