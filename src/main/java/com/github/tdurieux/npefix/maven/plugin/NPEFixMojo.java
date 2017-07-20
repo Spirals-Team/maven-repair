@@ -2,6 +2,7 @@ package com.github.tdurieux.npefix.maven.plugin;
 
 import fr.inria.spirals.npefix.config.Config;
 import fr.inria.spirals.npefix.main.DecisionServer;
+import fr.inria.spirals.npefix.main.all.DefaultRepairStrategy;
 import fr.inria.spirals.npefix.main.all.Launcher;
 import fr.inria.spirals.npefix.resi.CallChecker;
 import fr.inria.spirals.npefix.resi.context.Decision;
@@ -147,7 +148,7 @@ public class NPEFixMojo extends AbstractMojo {
 
         Date initDate = new Date();
 
-        Launcher  npefix = new Launcher(sources, outputDirectory.getAbsolutePath() + "/npefix-output", binFolder.getAbsolutePath(), classpath(dependencies), complianceLevel);
+        Launcher  npefix = new Launcher(sources, outputDirectory.getAbsolutePath() + "/npefix-output", binFolder.getAbsolutePath(), classpath(dependencies), complianceLevel, new DefaultRepairStrategy());
 
         //npefix.getSpoon().getEnvironment().setAutoImports(false);
 

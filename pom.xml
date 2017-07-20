@@ -34,13 +34,6 @@
     <developerConnection>scm:git:[fetch=]https://github.com/Spirals-Team/npefix-maven.git[push=]ssh://git@github.com/Spirals-Team/npefix-maven.git</developerConnection>
   </scm>
 
-  <distributionManagement>
-    <repository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    </repository>
-  </distributionManagement>
-
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
