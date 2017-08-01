@@ -56,6 +56,8 @@ import java.util.Set;
 //@Execute( lifecycle = "surefire", phase = LifecyclePhase.TEST )
 public class NPEFixMojo extends AbstractMojo {
 
+    private static String HARDCODED_NPEFIX_VERSION = "0.5";
+
     @Parameter(property = "java.version", defaultValue = "-1")
     protected String javaVersion;
 
@@ -275,7 +277,7 @@ public class NPEFixMojo extends AbstractMojo {
                 sb.append(s).append(File.pathSeparatorChar);
             }
         }
-        final Artifact artifact =artifactFactory.createArtifact("fr.inria.spirals","npefix", "0.5-SNAPSHOT", null, "jar");
+        final Artifact artifact =artifactFactory.createArtifact("fr.inria.spirals","npefix", HARDCODED_NPEFIX_VERSION, null, "jar");
         File file = new File(localRepository.getBasedir() + "/" + localRepository.pathOf(artifact));
 
         sb.append(file.getAbsoluteFile());
