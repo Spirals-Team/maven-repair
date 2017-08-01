@@ -9,7 +9,7 @@
 
   <groupId>fr.inria.gforge.spirals</groupId>
   <artifactId>npefix-maven</artifactId>
-  <version>1.2-SNAPSHOT</version>
+  <version>1.2</version>
   <packaging>maven-plugin</packaging>
 
   <name>Fix a maven project with NPEFix</name>
