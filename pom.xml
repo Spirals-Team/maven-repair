@@ -86,15 +86,15 @@
   </repositories>
 
   <distributionManagement>
-    <repository>
+    <!--repository>
       <id>internal-repo</id>
       <name>Temporary Staging Repository</name>
       <url>file://${project.build.directory}/mvn-repo/releases</url>
-    </repository>
-    <!--repository>
+    </repository-->
+    <repository>
       <id>ossrh</id>
       <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    </repository-->
+    </repository>
     <snapshotRepository>
       <id>internal-snapshot-repo</id>
       <name>Temporary Staging Snapshot Repository</name>
@@ -128,7 +128,7 @@
         </executions>
       </plugin>
 
-      <plugin>
+      <!--plugin>
         <groupId>com.github.github</groupId>
         <artifactId>site-maven-plugin</artifactId>
         <version>0.12</version>
@@ -153,7 +153,7 @@
             <phase>deploy</phase>
           </execution>
         </executions>
-      </plugin>
+      </plugin-->
     </plugins>
   </build>
 
