@@ -31,7 +31,7 @@ public class NPEfixMojoTest extends BetterAbstractMojoTestCase {
 		mvn_clean.waitFor();
 	}
 
-	public void testNopolRepair() throws Exception {
+	public void testNPEFixRepair() throws Exception {
 		File f = getTestFile("src/test/resources/projects/example2/pom.xml");
 		Mojo mojo = lookupConfiguredMojo(f, "npefix");
 		assertNotNull( mojo );
@@ -39,5 +39,7 @@ public class NPEfixMojoTest extends BetterAbstractMojoTestCase {
 
 		NPEFixMojo repair = (NPEFixMojo) mojo;
 		repair.execute();
+
+		assertTrue(repair.getResult().size() > 0);
 	}
 }

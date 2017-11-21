@@ -42,9 +42,6 @@ public class NopolMojo extends AbstractRepairMojo {
     @Parameter( defaultValue = "${project.build.directory}/nopol", property = "outputDir", required = true )
     private File outputDirectory;
 
-    @Parameter( defaultValue = "${project.build.directory}/nopol", property = "resultDir", required = true )
-    private File resultDirectory;
-
     @Parameter( defaultValue = "pre_then_cond", property = "type", required = true )
     private String type;
 
@@ -60,8 +57,9 @@ public class NopolMojo extends AbstractRepairMojo {
     @Parameter( defaultValue = "z3", property = "solver", required = true )
     private String solver;
 
+	private NopolResult result;
 
-    @Override
+	@Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         final List<String> failingTestCases = getFailingTests();
         final List<URL> dependencies = getClasspath();
@@ -78,7 +76,7 @@ public class NopolMojo extends AbstractRepairMojo {
         }
         for (int i = 0; i < nopolClasspath.size(); i++) {
             URL url = nopolClasspath.get(i);
-            if (!systemClasspath.contains(url.getPath())) {
+            if (systemClasspath.contains(url.getPath())) {
                 continue;
             }
             sb.append(url.getPath());
@@ -92,7 +90,7 @@ public class NopolMojo extends AbstractRepairMojo {
             System.setProperty("java.class.path", sb.toString());
             NopolContext nopolContext = createNopolContext(failingTestCases, dependencies, sourceFolders);
             final NoPol nopol = new NoPol(nopolContext);
-            NopolResult result = nopol.build();
+            this.result = nopol.build();
             printResults(result);
         } finally {
             System.setProperty("java.class.path", systemClasspath);
@@ -123,6 +121,10 @@ public class NopolMojo extends AbstractRepairMojo {
         nopolContext.setType(this.resolveType());
         nopolContext.setOnlyOneSynthesisResult(true);
         nopolContext.setJson(true);
+        if (!outputDirectory.exists()) {
+			outputDirectory.mkdirs();
+		}
+        nopolContext.setOutputFolder(outputDirectory.getAbsolutePath());
 
         NopolContext.NopolSolver solver = this.resolveSolver();
         nopolContext.setSolver(solver);
@@ -263,4 +265,8 @@ public class NopolMojo extends AbstractRepairMojo {
         }
         return new ArrayList<>(classpath);
     }
+
+	public NopolResult getResult() {
+		return result;
+	}
 }

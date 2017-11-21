@@ -79,6 +79,7 @@ public class NPEFixMojo extends AbstractRepairMojo {
     @Parameter( defaultValue = "default", property = "strategy", required = true )
     private String repairStrategy;
 
+    private NPEOutput result;
 
     public void execute() throws MojoExecutionException {
         List<Pair<String, Set<File>>> npeTests = getNPETest();
@@ -147,7 +148,7 @@ public class NPEFixMojo extends AbstractRepairMojo {
                 tests.add(npeTest.getKey());
             }
         }
-        NPEOutput lapses = run(npefix, tests);
+        this.result = run(npefix, tests);
 
 
         spoon.Launcher spoon = new spoon.Launcher();
@@ -158,7 +159,7 @@ public class NPEFixMojo extends AbstractRepairMojo {
         spoon.getModelBuilder().setSourceClasspath(classpath(dependencies).split(File.pathSeparatorChar + ""));
         spoon.buildModel();
 
-        JSONObject jsonObject = lapses.toJSON(spoon);
+        JSONObject jsonObject = result.toJSON(spoon);
         jsonObject.put("endInit", initDate.getTime());
         try {
             for (Decision decision : CallChecker.strategySelector.getSearchSpace()) {
@@ -334,5 +335,9 @@ public class NPEFixMojo extends AbstractRepairMojo {
         }
 
         return output;
+    }
+
+    public NPEOutput getResult() {
+        return result;
     }
 }

@@ -1,5 +1,6 @@
 package com.github.tdurieux.repair.maven.plugin;
 
+import fr.inria.lille.repair.nopol.NopolStatus;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
@@ -39,5 +40,7 @@ public class NopolMojoTest extends BetterAbstractMojoTestCase {
 
 		NopolMojo repair = (NopolMojo) mojo;
 		repair.execute();
+
+		assertEquals(NopolStatus.PATCH, repair.getResult().getNopolStatus());
 	}
 }
