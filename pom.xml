@@ -21,11 +21,11 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <default.encoding>UTF-8</default.encoding>
-    <maven.compiler.source>1.7</maven.compiler.source>
-    <maven.compiler.target>1.7</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
 
-    <java.src.version>1.7</java.src.version>
-    <java.test.version>1.7</java.test.version>
+    <java.src.version>1.8</java.src.version>
+    <java.test.version>1.8</java.test.version>
     <github.global.server>github</github.global.server>
   </properties>
 
@@ -102,6 +102,12 @@
       <artifactId>nopol</artifactId>
       <version>0.2-SNAPSHOT</version>
     </dependency>
+
+      <dependency>
+          <groupId>com.gzoltar</groupId>
+          <artifactId>gzoltar</artifactId>
+          <version>0.1.1</version>
+      </dependency>
 
 
     <dependency>
