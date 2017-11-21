@@ -8,17 +8,16 @@
   </parent>
 
   <groupId>fr.inria.gforge.spirals</groupId>
-  <artifactId>maven-repair</artifactId>
+  <artifactId>repair-maven-plugin</artifactId>
   <version>1.4-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
 
-  <name>Fix a maven project with NPEFix</name>
+  <name>Plugin to Automatically Fix failing test with Nopol and NPEFix</name>
 
   <!-- FIXME change it to the project's website -->
   <url />
 
   <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <default.encoding>UTF-8</default.encoding>
     <maven.compiler.source>1.8</maven.compiler.source>
@@ -30,8 +29,8 @@
   </properties>
 
   <scm>
-    <connection>scm:git:ssh://github.com/Spirals-Team/npefix-maven.git</connection>
-    <developerConnection>scm:git:[fetch=]https://github.com/Spirals-Team/npefix-maven.git[push=]ssh://git@github.com/Spirals-Team/npefix-maven.git</developerConnection>
+    <connection>scm:git:ssh://github.com/Spirals-Team/maven-repair.git</connection>
+    <developerConnection>scm:git:[fetch=]https://github.com/Spirals-Team/maven-repair.git[push=]ssh://git@github.com/Spirals-Team/maven-repair.git</developerConnection>
   </scm>
 
   <dependencies>
