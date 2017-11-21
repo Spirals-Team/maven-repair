@@ -209,8 +209,8 @@ public class NopolMojo extends AbstractRepairMojo {
 
     private List<URL> getNopolClasspath() {
         List<URL> classpath = new ArrayList<>();
-        Artifact artifactPom = artifactFactory.createArtifact("fr.inria.lille.adam","nopol", HARDCODED_NOPOL_VERSION, null, "pom");
-        Artifact artifactJar = artifactFactory.createArtifact("fr.inria.lille.adam","nopol", HARDCODED_NOPOL_VERSION, null, "jar");
+        Artifact artifactPom = artifactFactory.createArtifact("fr.inria.gforge.spirals","nopol", HARDCODED_NOPOL_VERSION, null, "pom");
+        Artifact artifactJar = artifactFactory.createArtifact("fr.inria.gforge.spirals","nopol", HARDCODED_NOPOL_VERSION, null, "jar");
         File filePom = new File(localRepository.getBasedir() + "/" + localRepository.pathOf(artifactPom));
         File fileJar = new File(localRepository.getBasedir() + "/" + localRepository.pathOf(artifactJar));
 
@@ -247,7 +247,7 @@ public class NopolMojo extends AbstractRepairMojo {
     public List<URL> getClasspath() {
         List<URL> classpath = super.getClasspath();
 
-        Artifact artifactJar = artifactFactory.createArtifact("fr.inria.lille.adam","nopol", HARDCODED_NOPOL_VERSION, null, "jar");
+        Artifact artifactJar = artifactFactory.createArtifact("fr.inria.gforge.spirals","nopol", HARDCODED_NOPOL_VERSION, null, "jar");
         File fileJar = new File(localRepository.getBasedir() + "/" + localRepository.pathOf(artifactJar));
 
         try {
