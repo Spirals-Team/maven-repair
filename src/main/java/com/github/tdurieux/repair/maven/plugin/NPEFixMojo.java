@@ -94,7 +94,7 @@ public class NPEFixMojo extends AbstractRepairMojo {
                 sourceFolders.addAll(test.getValue());
             }
         }
-        List<String> testFolders = getTestFolders();
+        List<File> testFolders = getTestFolders();
 
         classpath(dependencies);
 

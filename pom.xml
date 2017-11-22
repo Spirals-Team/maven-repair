@@ -96,6 +96,11 @@
             <version>0.2-SNAPSHOT</version>
         </dependency>
         <dependency>
+            <groupId>org.inria.sacha.automaticRepair</groupId>
+            <artifactId>astor</artifactId>
+            <version>0.0.2-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>fr.inria.spirals</groupId>
             <artifactId>npefix</artifactId>
             <version>0.6</version>
@@ -221,7 +226,7 @@
                 </executions>
             </plugin>
 
-            <!--plugin>
+            <plugin>
               <groupId>com.github.github</groupId>
               <artifactId>site-maven-plugin</artifactId>
               <version>0.12</version>
@@ -246,7 +251,7 @@
                   <phase>deploy</phase>
                 </execution>
               </executions>
-            </plugin-->
+            </plugin>
         </plugins>
     </build>
 

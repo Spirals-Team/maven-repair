@@ -9,22 +9,16 @@ import fr.inria.lille.repair.nopol.NoPol;
 import fr.inria.lille.repair.nopol.NopolResult;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
-import org.apache.maven.project.MavenProject;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -70,24 +64,11 @@ public class NopolMojo extends AbstractRepairMojo {
         final List<URL> nopolClasspath = getNopolClasspath();
         final String systemClasspath = System.getProperty("java.class.path");
 
-        final StringBuilder sb = new StringBuilder(systemClasspath);
-        if (sb.lastIndexOf(":") != sb.length() - 1) {
-            sb.append(":");
-        }
-        for (int i = 0; i < nopolClasspath.size(); i++) {
-            URL url = nopolClasspath.get(i);
-            if (systemClasspath.contains(url.getPath())) {
-                continue;
-            }
-            sb.append(url.getPath());
-            if (i < nopolClasspath.size() - 1) {
-                sb.append(":");
-            }
-        }
+		String strClasspath = getStringClasspathFromList(nopolClasspath, systemClasspath);
 
         try {
             setGzoltarDebug(true);
-            System.setProperty("java.class.path", sb.toString());
+            System.setProperty("java.class.path", strClasspath);
             NopolContext nopolContext = createNopolContext(failingTestCases, dependencies, sourceFolders);
             final NoPol nopol = new NoPol(nopolContext);
             this.result = nopol.build();
@@ -141,16 +122,6 @@ public class NopolMojo extends AbstractRepairMojo {
         return nopolContext;
     }
 
-    private void setGzoltarDebug(boolean debugValue) {
-        try {
-            Field debug = com.gzoltar.core.agent.Launcher.class.getDeclaredField("debug");
-            debug.setAccessible(true);
-            debug.setBoolean(null, debugValue);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-    }
-
     private NopolContext.NopolSolver resolveSolver() {
         try {
             return NopolContext.NopolSolver.valueOf(solver.toUpperCase());
@@ -202,11 +173,6 @@ public class NopolMojo extends AbstractRepairMojo {
         return null;
     }
 
-    private File getSurefireReportsDirectory( MavenProject subProject ) {
-        String buildDir = subProject.getBuild().getDirectory();
-        return new File( buildDir + "/surefire-reports" );
-    }
-
     private List<URL> getNopolClasspath() {
         List<URL> classpath = new ArrayList<>();
         Artifact artifactPom = artifactFactory.createArtifact("fr.inria.gforge.spirals","nopol", HARDCODED_NOPOL_VERSION, null, "pom");
@@ -214,32 +180,7 @@ public class NopolMojo extends AbstractRepairMojo {
         File filePom = new File(localRepository.getBasedir() + "/" + localRepository.pathOf(artifactPom));
         File fileJar = new File(localRepository.getBasedir() + "/" + localRepository.pathOf(artifactJar));
 
-        if (filePom.exists()) {
-            MavenXpp3Reader pomReader = new MavenXpp3Reader();
-            try (FileReader reader = new FileReader(filePom)) {
-                Model model = pomReader.read(reader);
-
-                List<Dependency> dependencies = model.getDependencies();
-                for (Dependency dependency : dependencies) {
-                    if (!dependency.isOptional() && dependency.getScope() == null && dependency.getVersion() != null) {
-                        Artifact artifact = artifactFactory.createArtifact(dependency.getGroupId(),dependency.getArtifactId(), dependency.getVersion(), null, dependency.getType());
-                        File jarFile = new File(localRepository.getBasedir() + "/" + localRepository.pathOf(artifact));
-
-                        classpath.add(jarFile.toURI().toURL());
-                    } else if ("system".equals(dependency.getScope())) {
-                        String path = dependency.getSystemPath().replace("${java.home}", System.getProperty("java.home"));
-                        File jarFile = new File(path);
-                        if (jarFile.exists()) {
-                            classpath.add(jarFile.toURI().toURL());
-                        }
-                    }
-                }
-                classpath.add(fileJar.toURI().toURL());
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.err.println("Error occured, dependency will be passed: "+e.getMessage());
-            }
-        }
+		classpath.addAll(getClassPathFromPom(filePom, fileJar));
         return classpath;
     }
 
@@ -261,7 +202,7 @@ public class NopolMojo extends AbstractRepairMojo {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Error occured, dependency will be passed: "+e.getMessage());
+            System.err.println("Error occurred, dependency will be passed: "+e.getMessage());
         }
         return new ArrayList<>(classpath);
     }
