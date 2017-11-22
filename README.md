@@ -37,7 +37,7 @@ cd /somewhere/my-project-with-failing-tests
 mvn test 
 
 # look for patches with last release
-mvn fr.inria.gforge.spirals:repair:<npefix|nopol>
+mvn fr.inria.gforge.spirals:repair-maven-plugin:<npefix|nopol>
 ```
 
 ## Output
