@@ -8,7 +8,9 @@ This is a Maven plugin for Java automatic repair. It's only goal is to simplify 
 - [X] NPEFix
 - [X] Nopol
 - [X] DynaMoth
-- [ ] Astor
+- [X] jGenProg
+- [X] jKali
+- [X] cardumen
 
 ## Install
 
