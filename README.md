@@ -1,8 +1,18 @@
-# npefix-maven [![Build Status](https://travis-ci.org/Spirals-Team/npefix-maven.svg?branch=master)](https://travis-ci.org/Spirals-Team/npefix-maven)
+# maven-repair [![Build Status](https://travis-ci.org/Spirals-Team/maven-repair.svg?branch=master)](https://travis-ci.org/Spirals-Team/maven-repair)
 
-This is a Maven plugin for NPEFix. It's only goal is to simplify the usage of NPEFix on Maven project.
+This is a Maven plugin for Java automatic repair. It's only goal is to simplify the automatic repair on Maven projects.
+
+
+## Atutomatic Repair Techniques
+
+- [X] NPEFix
+- [X] Nopol
+- [X] DynaMoth
+- [ ] Astor
 
 ## Install
+
+### Manual install
 
 ```bash
 git clone https://github.com/Spirals-Team/npefix-maven
@@ -10,19 +20,24 @@ cd npefix-maven
 mvn install
 ```
 
+### Maven
+
+```bash
+mvn org.apache.maven.plugins:maven-dependency-plugin:2.1:get \
+    -DrepoUrl=https://tdurieux.github.io/maven-repository/snapshots/ \
+    -Dartifact=fr.inria.gforge.spirals:repair-maven-plugin:1.4-SNAPSHOT
+``` 
+
 ## Usage
 
-```
-cd /somewhere/my-project-with-an-NPE
+```bash
+cd /somewhere/my-project-with-failing-tests
 
-# check there is a NullPointerException
+# check the failing tests
 mvn test 
 
 # look for patches with last release
-mvn fr.inria.gforge.spirals:npefix-maven:1.1:npefix
-
-# look for patches with snapshot
-mvn fr.inria.gforge.spirals:npefix-maven:1.2-SNAPSHOT:npefix
+mvn fr.inria.gforge.spirals:repair:<npefix|nopol>
 ```
 
 ## Output
@@ -30,10 +45,13 @@ mvn fr.inria.gforge.spirals:npefix-maven:1.2-SNAPSHOT:npefix
 ```
 # the patches are in target
 cat target/npefix/patches.json
+
+cat target/nopol/output.json
 ```
 
 ## Output Format
 
+### NPEFix
 ```js
 {
   "executions": [
