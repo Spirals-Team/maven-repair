@@ -121,6 +121,9 @@ public class GenProgMojo extends AbstractRepairMojo {
             }
             context.dependencies.add(path);
         }
+        if (context.dependencies.isEmpty()) {
+            context.dependencies.add(dependencies.get(0).getPath());
+        }
 
 
         return context;
