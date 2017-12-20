@@ -36,7 +36,7 @@ mvn org.apache.maven.plugins:maven-dependency-plugin:2.1:get \
 cd /somewhere/my-project-with-failing-tests
 
 # check the failing tests
-mvn test 
+mvn test -DtrimStackTrace=false
 
 # look for patches with last release
 mvn fr.inria.gforge.spirals:repair-maven-plugin:<npefix|nopol>
