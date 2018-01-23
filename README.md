@@ -1,9 +1,11 @@
-# maven-repair [![Build Status](https://travis-ci.org/Spirals-Team/maven-repair.svg?branch=master)](https://travis-ci.org/Spirals-Team/maven-repair)
+# maven-repair: a Maven plugin for executing automated program repair tools on Maven projects 
 
-This is a Maven plugin for Java automatic repair. It's only goal is to simplify the automatic repair on Maven projects.
+[![Build Status](https://travis-ci.org/Spirals-Team/maven-repair.svg?branch=master)](https://travis-ci.org/Spirals-Team/maven-repair)
+
+The goal of this projects is is to simplify automatic repair on Maven projects.
 
 
-## Atutomatic Repair Techniques
+## Automatic Repair Techniques
 
 - [X] NPEFix
 - [X] Nopol
@@ -38,7 +40,7 @@ cd /somewhere/my-project-with-failing-tests
 # check the failing tests
 mvn test -DtrimStackTrace=false
 
-# look for patches with last release
+# look for patches
 mvn fr.inria.gforge.spirals:repair-maven-plugin:<npefix|nopol>
 ```
 
