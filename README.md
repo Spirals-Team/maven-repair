@@ -19,8 +19,8 @@ The goal of this projects is is to simplify automatic repair on Maven projects.
 ### Manual install
 
 ```bash
-git clone https://github.com/Spirals-Team/npefix-maven
-cd npefix-maven
+git clone https://github.com/Spirals-Team/maven-repair
+cd maven-repair
 mvn install
 ```
 
@@ -40,8 +40,11 @@ cd /somewhere/my-project-with-failing-tests
 # check the failing tests
 mvn test -DtrimStackTrace=false
 
-# look for patches
-mvn fr.inria.gforge.spirals:repair-maven-plugin:<npefix|nopol>
+# look for patches with Nopol
+mvn fr.inria.gforge.spirals:repair-maven-plugin:nopol
+
+# look for patches with NpeFix
+mvn fr.inria.gforge.spirals:repair-maven-plugin:npefix
 ```
 
 ## Output
