@@ -4,7 +4,7 @@ import com.google.common.io.ByteStreams;
 import fr.inria.lille.commons.synthesis.smt.solver.SolverFactory;
 import fr.inria.lille.repair.common.config.NopolContext;
 import fr.inria.lille.repair.common.patch.Patch;
-import fr.inria.lille.repair.common.synth.StatementType;
+import fr.inria.lille.repair.common.synth.RepairType;
 import fr.inria.lille.repair.nopol.NoPol;
 import fr.inria.lille.repair.nopol.NopolResult;
 import org.apache.commons.lang3.StringUtils;
@@ -31,7 +31,7 @@ import java.util.List;
         requiresDependencyResolution = ResolutionScope.TEST)
 public class NopolMojo extends AbstractRepairMojo {
 
-    private static String HARDCODED_NOPOL_VERSION = "0.2-SNAPSHOT";
+    private static String HARDCODED_NOPOL_VERSION = "4613b76307ffa6812b699f8740c1bf81e550ffc0";
 
     @Parameter( defaultValue = "${project.build.directory}/nopol", property = "outputDir", required = true )
     private File outputDirectory;
@@ -146,11 +146,11 @@ public class NopolMojo extends AbstractRepairMojo {
         }
     }
 
-    private StatementType resolveType() {
+    private RepairType resolveType() {
         try {
-            return StatementType.valueOf(type.toUpperCase());
+            return RepairType.valueOf(type.toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Type value \""+type+"\" is wrong. Only following values are accepted: "+StringUtils.join(StatementType.values(), ","));
+            throw new RuntimeException("Type value \""+type+"\" is wrong. Only following values are accepted: "+StringUtils.join(RepairType.values(), ","));
         }
     }
 
