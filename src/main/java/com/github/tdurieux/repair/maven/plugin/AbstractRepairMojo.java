@@ -95,9 +95,11 @@ public abstract class AbstractRepairMojo extends AbstractMojo {
         List<URL> classpath = new ArrayList<>();
         for (MavenProject mavenProject : reactorProjects) {
             try {
-                for (String s : (List<String>)mavenProject.getTestClasspathElements()) {
+                for (String s : mavenProject.getTestClasspathElements()) {
                     File f = new File(s);
-                    classpath.add(f.toURI().toURL());
+                    if (f.exists()) {
+                        classpath.add(f.toURI().toURL());
+                    }
                 }
             } catch (DependencyResolutionRequiredException e) {
                 continue;
