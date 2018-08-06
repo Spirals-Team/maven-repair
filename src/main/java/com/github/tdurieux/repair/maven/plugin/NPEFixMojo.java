@@ -42,6 +42,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -84,7 +85,12 @@ public class NPEFixMojo extends AbstractRepairMojo {
     public void execute() throws MojoExecutionException {
         List<Pair<String, Set<File>>> npeTests = getNPETest();
 
-
+        try {
+            File currentDir = new File(".").getCanonicalFile();
+            Config.CONFIG.setRootProject(currentDir.toPath().toAbsolutePath());
+        } catch (IOException e) {
+            getLog().error("Error while setting the root project path, the created patches might have absolute paths.");
+        }
         final List<URL> dependencies = getClasspath();
         Set<File> sourceFolders = new HashSet<>();
         if ("project".equals(scope)) {

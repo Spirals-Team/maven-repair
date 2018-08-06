@@ -70,6 +70,14 @@ public class NopolMojo extends AbstractRepairMojo {
             setGzoltarDebug(true);
             System.setProperty("java.class.path", strClasspath);
             NopolContext nopolContext = createNopolContext(failingTestCases, dependencies, sourceFolders);
+
+            try {
+                File currentDir = new File(".").getCanonicalFile();
+                nopolContext.setRootProject(currentDir.toPath().toAbsolutePath());
+            } catch (IOException e) {
+                getLog().error("Error while setting the root project path, the created patches might have absolute paths.");
+            }
+
             final NoPol nopol = new NoPol(nopolContext);
             this.result = nopol.build();
             printResults(result);

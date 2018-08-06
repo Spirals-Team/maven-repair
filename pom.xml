@@ -93,7 +93,7 @@
         <dependency>
             <groupId>fr.inria.gforge.spirals</groupId>
             <artifactId>nopol</artifactId>
-            <version>4613b76307ffa6812b699f8740c1bf81e550ffc0</version>
+            <version>0.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.inria.sacha.automaticRepair</groupId>
