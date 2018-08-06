@@ -131,9 +131,9 @@ public class NPEFixMojo extends AbstractRepairMojo {
 
         Date initDate = new Date();
 
-        DefaultRepairStrategy strategy = new DefaultRepairStrategy();
+        DefaultRepairStrategy strategy = new DefaultRepairStrategy(sources);
         if (repairStrategy.toLowerCase().equals("TryCatch".toLowerCase())) {
-            strategy = new TryCatchRepairStrategy();
+            strategy = new TryCatchRepairStrategy(sources);
         }
         Launcher  npefix = new Launcher(sources, outputDirectory.getAbsolutePath() + "/npefix-output", binFolder.getAbsolutePath(), classpath(dependencies), complianceLevel, strategy);
 
