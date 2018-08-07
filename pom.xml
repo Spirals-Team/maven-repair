@@ -1,6 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -11,13 +9,13 @@
 
     <groupId>fr.inria.gforge.spirals</groupId>
     <artifactId>repair-maven-plugin</artifactId>
-    <version>1.5-SNAPSHOT</version>
+    <version>1.5</version>
     <packaging>maven-plugin</packaging>
 
     <name>Plugin to Automatically Fix failing test with Nopol and NPEFix</name>
 
     <!-- FIXME change it to the project's website -->
-    <url/>
+    <url />
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -162,13 +160,13 @@
             <name>Maven Repository for Spoon Release</name>
             <url>http://sachaproject.gforge.inria.fr/repositories/releases/
             </url>
-            <snapshots/>
+            <snapshots />
         </repository>
         <repository>
             <id>gforge.inria.fr-snapshot</id>
             <name>Maven Repository for Spoon Snapshot</name>
             <url>http://maven.inria.fr/artifactory/spoon-public-snapshot/</url>
-            <snapshots/>
+            <snapshots />
         </repository>
     </repositories>
 
