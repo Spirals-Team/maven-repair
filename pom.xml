@@ -9,7 +9,7 @@
 
     <groupId>fr.inria.gforge.spirals</groupId>
     <artifactId>repair-maven-plugin</artifactId>
-    <version>1.5</version>
+    <version>1.6-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
 
     <name>Plugin to Automatically Fix failing test with Nopol and NPEFix</name>
