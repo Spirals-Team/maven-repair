@@ -31,7 +31,7 @@ import java.util.List;
         requiresDependencyResolution = ResolutionScope.TEST)
 public class NopolMojo extends AbstractRepairMojo {
 
-    private static String HARDCODED_NOPOL_VERSION = "4613b76307ffa6812b699f8740c1bf81e550ffc0";
+    private static String HARDCODED_NOPOL_VERSION = "666abb764bf1819f6c316faf4fe5b559ac583de1";
 
     @Parameter( defaultValue = "${project.build.directory}/nopol", property = "outputDir", required = true )
     private File outputDirectory;
@@ -70,6 +70,14 @@ public class NopolMojo extends AbstractRepairMojo {
             setGzoltarDebug(true);
             System.setProperty("java.class.path", strClasspath);
             NopolContext nopolContext = createNopolContext(failingTestCases, dependencies, sourceFolders);
+
+            try {
+                File currentDir = new File(".").getCanonicalFile();
+                nopolContext.setRootProject(currentDir.toPath().toAbsolutePath());
+            } catch (IOException e) {
+                getLog().error("Error while setting the root project path, the created patches might have absolute paths.");
+            }
+
             final NoPol nopol = new NoPol(nopolContext);
             this.result = nopol.build();
             printResults(result);

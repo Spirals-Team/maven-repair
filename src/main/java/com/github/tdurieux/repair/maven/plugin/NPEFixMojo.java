@@ -42,6 +42,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -57,7 +58,7 @@ import java.util.Set;
         requiresDependencyResolution = ResolutionScope.TEST)
 public class NPEFixMojo extends AbstractRepairMojo {
 
-    private static String HARDCODED_NPEFIX_VERSION = "0.6";
+    private static String HARDCODED_NPEFIX_VERSION = "0.7";
     /**
      * Location of the file.
      */
@@ -84,7 +85,12 @@ public class NPEFixMojo extends AbstractRepairMojo {
     public void execute() throws MojoExecutionException {
         List<Pair<String, Set<File>>> npeTests = getNPETest();
 
-
+        try {
+            File currentDir = new File(".").getCanonicalFile();
+            Config.CONFIG.setRootProject(currentDir.toPath().toAbsolutePath());
+        } catch (IOException e) {
+            getLog().error("Error while setting the root project path, the created patches might have absolute paths.");
+        }
         final List<URL> dependencies = getClasspath();
         Set<File> sourceFolders = new HashSet<>();
         if ("project".equals(scope)) {
@@ -131,9 +137,9 @@ public class NPEFixMojo extends AbstractRepairMojo {
 
         Date initDate = new Date();
 
-        DefaultRepairStrategy strategy = new DefaultRepairStrategy();
+        DefaultRepairStrategy strategy = new DefaultRepairStrategy(sources);
         if (repairStrategy.toLowerCase().equals("TryCatch".toLowerCase())) {
-            strategy = new TryCatchRepairStrategy();
+            strategy = new TryCatchRepairStrategy(sources);
         }
         Launcher  npefix = new Launcher(sources, outputDirectory.getAbsolutePath() + "/npefix-output", binFolder.getAbsolutePath(), classpath(dependencies), complianceLevel, strategy);
 
