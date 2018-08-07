@@ -31,7 +31,7 @@ import java.util.List;
         requiresDependencyResolution = ResolutionScope.TEST)
 public class NopolMojo extends AbstractRepairMojo {
 
-    private static String HARDCODED_NOPOL_VERSION = "4613b76307ffa6812b699f8740c1bf81e550ffc0";
+    private static String HARDCODED_NOPOL_VERSION = "666abb764bf1819f6c316faf4fe5b559ac583de1";
 
     @Parameter( defaultValue = "${project.build.directory}/nopol", property = "outputDir", required = true )
     private File outputDirectory;

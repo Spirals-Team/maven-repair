@@ -58,7 +58,7 @@ import java.util.Set;
         requiresDependencyResolution = ResolutionScope.TEST)
 public class NPEFixMojo extends AbstractRepairMojo {
 
-    private static String HARDCODED_NPEFIX_VERSION = "0.6";
+    private static String HARDCODED_NPEFIX_VERSION = "0.7";
     /**
      * Location of the file.
      */
